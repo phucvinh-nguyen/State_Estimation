@@ -13,23 +13,23 @@ plt.grid(True)
 plt.show()
 
 # Define the H matrix - what does it contain?
-H = np.array([[1, 1, 1, 1, 1]]).T
+H = np.ones((5, 2)) # H(5,2) because we have 5 measurements and 2 unknown variables
+
+H[:, 0] = I.ravel()
 
 H_T = H.T #Transpose of H
-
-# Define the y matrix - what does it contain?
-y = V / I
-print (y)
+print (H_T)
+print (H)
+print (H_T.dot(H))
 # Now estimate the resistance parameter.
-R = np.linalg.inv(H_T @ H) @ H_T @ y
+R = inv(H.T.dot(H)).dot(H.T.dot(V))
 
-
+print (R)
 print('The slope parameter of the best-fit line (i.e., the resistance) is:')
 print(R[0, 0])
 
 I_line = np.arange(0, 0.8, 0.1).reshape(8, 1)
-print (I_line)
-V_line = R*I_line
+V_line = R[0,0]*I_line
 
 plt.scatter(I, V)
 plt.plot(I_line, V_line)
