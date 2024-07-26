@@ -37,7 +37,8 @@ V_line = x_ls[0]*I_line + x_ls[1]
 ## Recursive Solution
 
 # Initialize the 2x1 parameter vector x (i.e., x_0).
-x_k = np.array([[4], [0]])
+x_k = np.array([[4], [0]]) # Include the initial values of R and b (bias)
+
 
 #Initialize the 2x2 covaraince matrix (i.e. P_0). Off-diangonal elements should be zero.
 P_k = np.array([[81, 0], [0,0.04]])
@@ -46,28 +47,31 @@ P_k = np.array([[81, 0], [0,0.04]])
 R_k = np.array([[0.0225]])
 
 # Pre allocate space to save our estimates at every step.
-num_meas = I.shape[0]
+num_meas = I.shape[0] #number of measurements
 
-x_hist = np.zeros((num_meas + 1, 2))
-P_hist = np.zeros((num_meas + 1, 2, 2))
+x_hist = np.zeros((num_meas + 1, 2)) # restore the history of state matrix
 
-x_hist[0] = x_k.ravel()
-P_hist[0] = P_k
+P_hist = np.zeros((num_meas + 1, 2, 2)) # restore the history of covariance matrix
+
+x_hist[0] = x_k.ravel() #initial state matrix
+P_hist[0] = P_k #initial covariance matrix (2x2)
+
 
 # Iterate over all the available measurements.
 for k in range(num_meas):
     # Construct H_k (Jacobian).
-    H_k = np.array([[I[k, 0], 1]])
-
+    H_k = np.array([[I[k, 0], 1]]) #Matrix(1x2)
+    
     # Construct K_k (gain matrix).
-    K_k = P_k.dot(H_k.T).dot(inv(H_k.dot(P_k).dot(H_k.T) + R_k))
+    K_k = P_k.dot(H_k.T).dot(inv(H_k.dot(P_k).dot(H_k.T) + R_k)) #Matrix 2x1
+    
                     
     # Update our estimate.
-    x_k = x_k + K_k.dot(V[k] - H_k.dot(x_k))
- 
+    x_k = x_k + K_k.dot(V[k] - H_k.dot(x_k)) #Matrix (2x1) - (R, b)
+
     # Update our uncertainty (covariance)
     P_k = (np.eye(2) - K_k.dot(H_k)).dot(P_k)
-
+    print ("np = ", np.eye(2)) #2x2 matrix
     # Keep track of our history.
     P_hist[k + 1] = P_k
     x_hist[k + 1] = x_k.ravel()
